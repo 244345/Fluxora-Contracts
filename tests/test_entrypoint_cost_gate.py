@@ -4,6 +4,9 @@ from script import validate_gas
 from script.validate_gas import compare, entrypoints, parse_measurements
 
 
+def test_inventory_is_all_29_abi_entries():
+    names = entrypoints()
+    assert len(names) == 29
 def test_inventory_is_all_25_abi_entries():
     names = entrypoints()
     assert len(names) == 25
