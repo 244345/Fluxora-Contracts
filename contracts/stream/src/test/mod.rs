@@ -101,6 +101,8 @@ mod ttl;
 // Stage 4
 mod stream_ids;
 
+// Issue #1875 — docs/ARCHITECTURE.md, checked against the code it describes.
+mod architecture;
 // Issue #1870 — the documented migration path, walked and cross-checked
 // against the committed ABI inventory.
 mod migration;
