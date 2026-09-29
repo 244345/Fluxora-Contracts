@@ -123,6 +123,8 @@ mod stream_exists_bounds;
 // that CI step matched zero tests.
 mod packaging;
 
+// Issue #1860 — the id allocator must be a function of the counter alone, never of which records happen to be present
+mod id_reuse_proptest;
 // Issue #1842 — treat `paused_total` as an accumulator — including the events that carry it and the `u64` bound it grows against
 mod paused_total_cycles;
 // Issue #1851 — `cancel` settles the record in place — rewriting `deposited` and collapsing `end_time` — so `get_stream` is the entry point that has to report a moved schedule
