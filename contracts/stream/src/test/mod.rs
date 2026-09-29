@@ -54,6 +54,8 @@ mod cliff;
 // cannot move. See `docs/KNOWN-LIMITATIONS.md` §7.
 mod cliff_mode;
 mod delegation;
+// Issue #1845: delegation surviving a recipient transfer.
+mod delegation_transfer;
 
 // Issue #1882 — stream parties on the delegate paths without a grant.
 mod delegate_party_without_grant;
