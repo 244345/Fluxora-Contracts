@@ -955,10 +955,17 @@ fn batch_withdraw_same_recipient_settles_payroll_with_single_authorisation() {
 
     let total = h.client.batch_withdraw(&h.recipient, &h.ids(&ids));
     assert_eq!(total, expected_total);
+
+    // Capture contract events before any further cross-contract call: in the
+    // test host, invoking another contract (e.g. the token `balance` read
+    // below) rotates the recorded event buffer, so reading events afterwards
+    // observes nothing.
+    let event_ids = withdrawn_event_ids(&h);
+
     assert_eq!(h.balance(&h.recipient), expected_total);
 
     // Assert events are emitted per stream, not per batch (in exact batch order).
-    assert_eq!(withdrawn_event_ids(&h), ids);
+    assert_eq!(event_ids, ids);
 
     for (i, id) in ids.iter().enumerate() {
         assert_eq!(h.get(*id).withdrawn, expected_per_stream[i]);
