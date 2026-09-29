@@ -54,6 +54,8 @@ mod cliff;
 // cannot move. See `docs/KNOWN-LIMITATIONS.md` §7.
 mod cliff_mode;
 mod delegation;
+// Issue #1838 — a delegate acting in the very ledger its grant expires.
+mod delegate_expiry_boundary;
 // Issue #1734: comprehensive revoke_delegate coverage — per-bit, no-op on
 // never-issued grants, same-ledger effect, and multi-delegate isolation.
 mod revoke_delegate;
