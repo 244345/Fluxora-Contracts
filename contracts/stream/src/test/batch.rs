@@ -1097,6 +1097,19 @@ fn batch_withdraw_same_recipient_settles_payroll_with_single_authorisation() {
 
     let total = h.client.batch_withdraw(&h.recipient, &h.ids(&ids));
 
+    // Capture the event log right away: any later contract call (the token
+    // balance read below, `h.get`) starts a fresh invocation and the batch's
+    // events are no longer observable from it. Same discipline as the sibling
+    // `a_successful_batch_emits_withdrawn_events_in_batch_order`.
+    let events = withdrawn_event_ids(&h);
+
+    assert_eq!(total, expected_total);
+    assert_eq!(
+        events, ids,
+        "events emitted per stream, in exact batch order"
+    );
+    assert_eq!(h.balance(&h.recipient), expected_total);
+
     // Capture the batch's events before any other client call: `Events::all()`
     // only retains the most recent invocation, so a balance read between the
     // batch and this helper wipes the stream's own events (as it did when this
