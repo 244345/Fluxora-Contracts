@@ -123,6 +123,8 @@ mod stream_exists_bounds;
 // that CI step matched zero tests.
 mod packaging;
 
+// Issue #1842 — treat `paused_total` as an accumulator — including the events that carry it and the `u64` bound it grows against
+mod paused_total_cycles;
 // Issue #1851 — `cancel` settles the record in place — rewriting `deposited` and collapsing `end_time` — so `get_stream` is the entry point that has to report a moved schedule
 mod get_stream_cancelled;
 // Issue #1841 — a one-second schedule is the smallest non-degenerate stream, and the only duration where the vesting curve is two points and the dust-rate floor is unreachable
