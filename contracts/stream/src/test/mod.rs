@@ -55,6 +55,8 @@ mod cliff;
 mod cliff_mode;
 mod delegation;
 
+// Issue #1882 — stream parties on the delegate paths without a grant.
+mod delegate_party_without_grant;
 // Issue #1881 — two delegates sharing one permission on one stream.
 mod multi_delegate;
 // Issue #1838 — a delegate acting in the very ledger its grant expires.
