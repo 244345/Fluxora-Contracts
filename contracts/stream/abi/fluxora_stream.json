@@ -54,7 +54,6 @@
     },
     {
       "name": "create_stream_with_curve",
-      "name": "create_stream_with_cliff_mode",
       "auth": "sender",
       "inputs": [
         {"name": "sender", "type": "Address"},
@@ -68,6 +67,20 @@
         {"name": "pausable", "type": "bool"},
         {"name": "transferable", "type": "bool"},
         {"name": "curve", "type": "ReleaseCurve"}
+      ],
+      "outputs": "Result<u64, Error>"
+    },
+    {
+      "name": "create_stream_with_cliff_mode",
+      "auth": "sender",
+      "inputs": [
+        {"name": "sender", "type": "Address"},
+        {"name": "recipient", "type": "Address"},
+        {"name": "token", "type": "Address"},
+        {"name": "deposit", "type": "i128"},
+        {"name": "start_time", "type": "u64"},
+        {"name": "end_time", "type": "u64"},
+        {"name": "cliff_time", "type": "u64"},
         {"name": "cliff_mode", "type": "CliffMode"},
         {"name": "cancellable", "type": "bool"},
         {"name": "pausable", "type": "bool"},
@@ -292,22 +305,28 @@
   "types": [
     {
       "name": "ReleaseCurve",
+      "kind": "enum",
+      "fields": [],
+      "cases": [
+        {"name": "Linear", "discriminant": 0},
+        {"name": "Step", "discriminant": 1},
+        {"name": "FrontLoaded", "discriminant": 2}
+      ]
+    },
+    {
       "name": "BatchCancelOutcome",
       "kind": "struct",
       "fields": [
         {"name": "refunded", "type": "i128"},
         {"name": "refused_index", "type": "Option<u32>"},
         {"name": "refused_reason", "type": "Option<u32>"}
-      ],
-      "cases": [
+      ]
+    },
+    {
       "name": "CliffMode",
       "kind": "enum",
-      "fields": [
-      ],
+      "fields": [],
       "cases": [
-        {"name": "Linear", "discriminant": 0},
-        {"name": "Step", "discriminant": 1},
-        {"name": "FrontLoaded", "discriminant": 2}
         {"name": "Schedule", "discriminant": 0},
         {"name": "WallClock", "discriminant": 1}
       ]
@@ -484,7 +503,7 @@
         {"name": "cancellable", "type": "bool"},
         {"name": "pausable", "type": "bool"},
         {"name": "transferable", "type": "bool"},
-        {"name": "curve", "type": "ReleaseCurve"}
+        {"name": "curve", "type": "ReleaseCurve"},
         {"name": "cliff_mode", "type": "CliffMode"}
       ]
     },
