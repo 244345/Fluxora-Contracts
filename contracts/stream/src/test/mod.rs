@@ -54,6 +54,9 @@ mod cliff;
 // cannot move. See `docs/KNOWN-LIMITATIONS.md` §7.
 mod cliff_mode;
 mod delegation;
+
+// Issue #1881 — two delegates sharing one permission on one stream.
+mod multi_delegate;
 // Issue #1838 — a delegate acting in the very ledger its grant expires.
 mod delegate_expiry_boundary;
 // Issue #1734: comprehensive revoke_delegate coverage — per-bit, no-op on
