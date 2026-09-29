@@ -138,6 +138,10 @@ mod stream_exists_bounds;
 // that CI step matched zero tests.
 mod packaging;
 
+// Issue #1868 — replaying the event stream alone must reconstruct every
+// stream's state, so an indexer with no on-chain per-party index can answer
+// "which streams are mine" and keep its mirror of `get_stream` correct.
+mod event_reconstruction;
 // Issue #1860 — the id allocator must be a function of the counter alone, never of which records happen to be present
 mod id_reuse_proptest;
 // Issue #1842 — treat `paused_total` as an accumulator — including the events that carry it and the `u64` bound it grows against
