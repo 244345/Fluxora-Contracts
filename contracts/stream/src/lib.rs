@@ -58,10 +58,18 @@ compile_error!("Fluxora production WASM must not enable the testutils feature.")
 extern crate std;
 
 mod accrual;
+<<<<<<< HEAD
+#[cfg(test)]
+mod checksum;
+#[cfg(test)]
+mod protocol_limits;
+mod token_check;
+=======
 mod error;
 mod events;
 mod storage;
 mod types;
+>>>>>>> upstream/main
 
 pub use accrual::{
     cliff_reached, duration, elapsed, liability, refundable, stream_time, vested, withdrawable,
