@@ -639,6 +639,10 @@ fn test_cancel_then_withdraw_at(offset: u64) {
     h.client.cancel(&id);
 
     if expected_vested == 0 {
+        // The cancel has already run, so the stream is terminal with nothing
+        // left. `withdraw` distinguishes that from a live stream that simply
+        // has not accrued: terminal + empty is `StreamTerminated`, not
+        // `NothingToWithdraw` (docs/ABI.md, "withdraw" errors).
         // Cancelled is terminal, so draining an empty tail is
         // StreamTerminated — not the live-stream NothingToWithdraw path.
         // Pinned by `cancel::cancel_at_the_instant_of_creation_refunds_everything`.
