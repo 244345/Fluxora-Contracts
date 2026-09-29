@@ -50,6 +50,9 @@ mod amount_domain;
 mod cancel_events;
 mod cliff;
 mod delegation;
+// Issue #1734: comprehensive revoke_delegate coverage — per-bit, no-op on
+// never-issued grants, same-ledger effect, and multi-delegate isolation.
+mod revoke_delegate;
 // Issue #1854: two delegates holding WITHDRAW on one stream settle in the
 // same ledger serialised by storage — no double settlement, funds conserved.
 mod delegate_concurrent_withdraw;
