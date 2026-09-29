@@ -129,6 +129,8 @@ mod stream_count_consistency;
 mod read_methods_no_side_effects;
 mod read_ttl_matrix;
 
+// Issue #1835 — a recipient transfer in the same ledger as a withdrawal.
+mod transfer_withdraw_same_ledger;
 // Issue #1857 — the contract's token balance always covers the summed live
 // stream liability, asserted over randomized operation sequences.
 mod pool_liability_proptest;
