@@ -129,6 +129,9 @@ mod stream_count_consistency;
 mod read_methods_no_side_effects;
 mod read_ttl_matrix;
 
+// Issue #1857 — the contract's token balance always covers the summed live
+// stream liability, asserted over randomized operation sequences.
+mod pool_liability_proptest;
 // Issue #1852 — TTL extension on a stream at its minimum TTL floor.
 mod ttl_minimum_extension;
 // Issue #1850 — an id at or beyond `stream_count()` was never issued, and is
