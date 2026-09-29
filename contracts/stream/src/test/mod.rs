@@ -84,6 +84,10 @@ mod top_up;
 mod transfer;
 mod withdraw_cancel_same_ledger;
 
+// Issue #1815 — non-linear release curves: monotonicity, total conservation,
+// and backwards compatibility of the frozen v1 storage layout.
+mod release_curves;
+
 // Stage 3
 mod accounting_identity;
 // Issue #1856 — the `withdrawable + refundable == deposited - withdrawn`

@@ -246,6 +246,8 @@ class TestParseRenamesTable:
 class TestParseEntrypointCountClaim:
     def test_extracts_v1_count(self, real_doc):
         count = vm.parse_entrypoint_count_claim(real_doc)
+        # 16 after the v1 rewrite, 17 once `create_stream_with_curve` (#1815)
+        # was added to the core surface.
         assert count == 21
         assert count == 17
 

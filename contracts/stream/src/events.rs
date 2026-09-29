@@ -109,10 +109,13 @@
 //! against storage and token balances in `test::cancel_events`.
 use soroban_sdk::{contractevent, Address, Env, String};
 
+use crate::types::{ReleaseCurve, Stream, StreamStatus};
 use crate::types::{CliffMode, Stream, StreamStatus};
 
 /// A new stream was created. Carries the complete initial state — this is the
-/// event an indexer builds its sender/recipient mapping from.
+/// event an indexer builds its sender/recipient mapping from — including the
+/// [`ReleaseCurve`], so the schedule shape is visible without a follow-up
+/// `get_stream` call.
 #[contractevent]
 pub struct StreamCreated {
     #[topic]
@@ -129,6 +132,9 @@ pub struct StreamCreated {
     pub cancellable: bool,
     pub pausable: bool,
     pub transferable: bool,
+    /// Shape of the release schedule. [`ReleaseCurve::Linear`] for a stream
+    /// created through `create_stream`.
+    pub curve: ReleaseCurve,
     /// Which clock the cliff gate is read against. Appended in ABI v2 — see
     /// `test::abi`. An indexer that predates the field should treat a missing
     /// `cliff_mode` as `CliffMode::Schedule`, which is what the entry point that
@@ -348,6 +354,7 @@ pub fn stream_created(env: &Env, stream_id: u64, stream: &Stream) {
         cancellable: stream.cancellable,
         pausable: stream.pausable,
         transferable: stream.transferable,
+        curve: stream.curve,
         cliff_mode: stream.cliff_mode,
         reference: stream.reference.clone(),
     }
