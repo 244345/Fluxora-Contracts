@@ -49,6 +49,10 @@ mod capabilities;
 mod amount_domain;
 mod cancel_events;
 mod cliff;
+// Wall-clock vs schedule-relative cliff gate. `test::cliff` pins the
+// schedule-relative half (issue #1688); this is the opt-out that pausing
+// cannot move. See `docs/KNOWN-LIMITATIONS.md` §7.
+mod cliff_mode;
 mod delegation;
 // Issue #1734: comprehensive revoke_delegate coverage — per-bit, no-op on
 // never-issued grants, same-ledger effect, and multi-delegate isolation.

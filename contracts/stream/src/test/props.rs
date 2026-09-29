@@ -29,7 +29,7 @@ use soroban_sdk::{Address, Env};
 
 use super::common::*;
 use crate::accrual;
-use crate::types::{Stream, StreamStatus};
+use crate::types::{CliffMode, Stream, StreamStatus};
 
 /// Build a stream directly, bypassing the contract, so a property case costs
 /// no host invocations.
@@ -44,6 +44,7 @@ fn stream_of(deposited: i128, start: u64, duration: u64, cliff_offset: u64) -> S
         start_time: start,
         end_time: start + duration,
         cliff_time: start + cliff_offset,
+        cliff_mode: CliffMode::Schedule,
         cancellable: true,
         pausable: true,
         transferable: true,
