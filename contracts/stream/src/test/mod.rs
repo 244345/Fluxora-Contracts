@@ -123,6 +123,8 @@ mod stream_exists_bounds;
 // that CI step matched zero tests.
 mod packaging;
 
+// Issue #1841 — a one-second schedule is the smallest non-degenerate stream, and the only duration where the vesting curve is two points and the dust-rate floor is unreachable
+mod one_second_stream;
 // Issue #1840 — a stream funded with the maximum representable deposit
 // (`i128::MAX`), driven end to end through the public ABI on a dedicated
 // full-range asset; also pins the creation-guard boundary that rejects it.
