@@ -36,6 +36,7 @@ use crate::events::{
     Cancelled, Paused, RecipientTransferred, Resumed, StreamCreated, ToppedUp, TtlExtended,
     Withdrawn,
 };
+use crate::{BatchCancelOutcome, Error, FluxoraStream, Stream, StreamStatus, ABI_VERSION};
 use crate::{CliffMode, Error, FluxoraStream, Stream, StreamStatus, ABI_VERSION};
 
 // ---------------------------------------------------------------------------
@@ -96,6 +97,7 @@ const AUTH: &[(&str, &str)] = &[
     ("create_stream_with_cliff_mode", "sender"),
     ("top_up", "sender"),
     ("cancel", "sender"),
+    ("batch_cancel", "sender"),
     ("pause", "sender"),
     ("resume", "sender"),
     ("withdraw", "recipient"),
@@ -283,6 +285,7 @@ fn current_inventory() -> Inventory {
         function_from_spec(parse_spec(&FluxoraStream::spec_xdr_withdraw())),
         function_from_spec(parse_spec(&FluxoraStream::spec_xdr_batch_withdraw())),
         function_from_spec(parse_spec(&FluxoraStream::spec_xdr_cancel())),
+        function_from_spec(parse_spec(&FluxoraStream::spec_xdr_batch_cancel())),
         function_from_spec(parse_spec(&FluxoraStream::spec_xdr_pause())),
         function_from_spec(parse_spec(&FluxoraStream::spec_xdr_resume())),
         function_from_spec(parse_spec(&FluxoraStream::spec_xdr_transfer_recipient())),
@@ -308,6 +311,7 @@ fn current_inventory() -> Inventory {
     functions.sort_by(|a, b| a.name.cmp(&b.name));
 
     let mut types = vec![
+        type_from_spec(parse_spec(&BatchCancelOutcome::spec_xdr())),
         type_from_spec(parse_spec(&Stream::spec_xdr())),
         type_from_spec(parse_spec(&StreamStatus::spec_xdr())),
         type_from_spec(parse_spec(&CliffMode::spec_xdr())),
@@ -1399,8 +1403,6 @@ fn missing_stream_failure_is_stream_not_found_discriminant_one() {
 
 #[test]
 fn oversized_batch_failure_is_batch_too_large_discriminant_nineteen() {
-    use super::common::*;
-    use crate::Error;
 
     let h = Harness::new();
     let ids: std::vec::Vec<u64> = (0..17).collect();

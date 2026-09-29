@@ -7,6 +7,7 @@ from script.validate_gas import compare, entrypoints, parse_measurements
 def test_inventory_is_all_25_abi_entries():
     names = entrypoints()
     assert len(names) == 25
+    assert {"withdraw", "batch_withdraw", "batch_cancel", "delegate_withdraw"} <= names
     assert {
         "withdraw",
         "batch_withdraw",

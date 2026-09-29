@@ -78,6 +78,8 @@ mod accounting_identity;
 mod accounting_property;
 mod accrual_overflow;
 mod batch;
+// Issue #1811: bounded batch cancellation, reported by index on refusal.
+mod batch_cancel;
 
 // Issue #1866 — the MAX_BATCH_SIZE ceiling across every batch entry point.
 mod batch_ceiling;
