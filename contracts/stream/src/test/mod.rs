@@ -87,6 +87,8 @@ mod accounting_identity;
 mod accounting_property;
 mod accrual_overflow;
 mod batch;
+// Issue #1810 — atomic, bounded payroll-style stream creation.
+mod batch_create;
 // Issue #1811: bounded batch cancellation, reported by index on refusal.
 mod batch_cancel;
 

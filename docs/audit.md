@@ -11,6 +11,8 @@ Last verified: 2026-08-29 (PR #1665)
 
 | Entrypoint | Description |
 |---|---|
+| `create_stream` | Create a new payment stream with deposit, schedule, and capability flags |
+| `batch_create` | Atomically create multiple payment streams in one transaction |
 | `create_stream` | Create a new payment stream with deposit, schedule, and capability flags (`cliff_mode` is `Schedule`) |
 | `create_stream_with_cliff_mode` | Same as `create_stream`, plus an explicit `cliff_mode` choosing whether the cliff gate is read on the stream clock or the wall clock |
 | `top_up` | Extend stream duration at a fixed rate (sender auth) |

@@ -76,6 +76,7 @@ pub use storage::{
     MIN_STREAM_TTL_LEDGERS, SECONDS_PER_LEDGER, TTL_BUFFER_SECONDS, TTL_SAFETY_MARGIN_PERCENT,
 };
 pub use types::op;
+pub use types::{BatchCreateRequest, DataKey, DelegateGrant, Stream, StreamStatus};
 pub use types::{BatchCancelOutcome, DataKey, DelegateGrant, Stream, StreamStatus};
 pub use types::{CliffMode, DataKey, DelegateGrant, Stream, StreamStatus};
 pub use types::{DataKey, DelegateGrant, Stream, StreamStatus, MAX_REFERENCE_LENGTH};
@@ -392,6 +393,35 @@ impl FluxoraStream {
     ) -> Result<u64, Error> {
         sender.require_auth();
 
+        Self::create_stream_unchecked(
+            env,
+            sender,
+            recipient,
+            token,
+            deposit,
+            start_time,
+            end_time,
+            cliff_time,
+            cancellable,
+            pausable,
+            transferable,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn create_stream_unchecked(
+        env: Env,
+        sender: Address,
+        recipient: Address,
+        token: Address,
+        deposit: i128,
+        start_time: u64,
+        end_time: u64,
+        cliff_time: u64,
+        cancellable: bool,
+        pausable: bool,
+        transferable: bool,
+    ) -> Result<u64, Error> {
         if sender == recipient {
             return Err(Error::SelfStream);
         }
@@ -465,6 +495,66 @@ impl FluxoraStream {
 
         events::stream_created(&env, stream_id, &stream);
         Ok(stream_id)
+    }
+
+    /// Create several streams atomically for one sender.
+    ///
+    /// All requests are validated and submitted in this invocation. Soroban
+    /// rolls back the complete invocation if any element fails, so a failed
+    /// transfer cannot leave a partially-created payroll. IDs are returned in
+    /// the same order as the input requests.
+    pub fn batch_create(
+        env: Env,
+        sender: Address,
+        requests: Vec<BatchCreateRequest>,
+    ) -> Result<Vec<u64>, Error> {
+        if requests.is_empty() {
+            return Err(Error::EmptyBatch);
+        }
+        if requests.len() > MAX_BATCH_SIZE {
+            return Err(Error::BatchTooLarge);
+        }
+        sender.require_auth();
+
+        // Validate the complete batch before the first token call. This makes
+        // malformed payroll input fail before any external transfer is tried;
+        // the transaction-level rollback still guarantees all-or-none when a
+        // later token transfer fails.
+        for request in requests.iter() {
+            if request.recipient == sender {
+                return Err(Error::SelfStream);
+            }
+            if request.deposit <= 0 {
+                return Err(Error::InvalidDeposit);
+            }
+            if request.end_time <= request.start_time {
+                return Err(Error::InvalidTimeRange);
+            }
+            if request.cliff_time < request.start_time || request.cliff_time > request.end_time {
+                return Err(Error::InvalidCliff);
+            }
+            if request.deposit < (request.end_time - request.start_time) as i128 {
+                return Err(Error::DepositRateTooLow);
+            }
+        }
+
+        let mut ids = Vec::new(&env);
+        for request in requests.iter() {
+            ids.push_back(Self::create_stream_unchecked(
+                env.clone(),
+                sender.clone(),
+                request.recipient.clone(),
+                request.token.clone(),
+                request.deposit,
+                request.start_time,
+                request.end_time,
+                request.cliff_time,
+                request.cancellable,
+                request.pausable,
+                request.transferable,
+            )?);
+        }
+        Ok(ids)
     }
 
     /// Add funds to a live stream.
