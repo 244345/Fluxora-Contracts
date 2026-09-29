@@ -123,6 +123,8 @@ mod stream_exists_bounds;
 // that CI step matched zero tests.
 mod packaging;
 
+// Issue #1851 — `cancel` settles the record in place — rewriting `deposited` and collapsing `end_time` — so `get_stream` is the entry point that has to report a moved schedule
+mod get_stream_cancelled;
 // Issue #1841 — a one-second schedule is the smallest non-degenerate stream, and the only duration where the vesting curve is two points and the dust-rate floor is unreachable
 mod one_second_stream;
 // Issue #1840 — a stream funded with the maximum representable deposit
