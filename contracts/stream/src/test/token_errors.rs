@@ -1077,3 +1077,45 @@ fn token_error_discriminants_match_the_abi_table() {
 fn token_amount_mismatch_discriminant_matches_the_abi_table() {
     assert_eq!(Error::TokenAmountMismatch as u32, 32);
 }
+
+#[test]
+fn create_stream_with_false_returning_token_is_rejected() {
+    let h = Harness::new();
+    let (token, false_token) = register_false_token(&h);
+
+    let start = h.now();
+    let err = h
+        .client
+        .try_create_stream(
+            &h.sender,
+            &h.recipient,
+            &token,
+            &(1_000 * ONE),
+            &start,
+            &(start + 100 * DAY),
+            &start,
+            &true,
+            &true,
+            &true,
+        )
+        .unwrap_err()
+        .unwrap();
+
+    assert_eq!(err, Error::TokenTransferFailed);
+    assert_eq!(h.client.stream_count(), 0, "id counter must not advance");
+    assert!(!h.client.stream_exists(&0), "no phantom entry at id 0");
+    assert_eq!(
+        false_token.balance(&h.sender),
+        10_000 * ONE,
+        "failed transfer must not debit or credit the sender"
+    );
+    assert_eq!(
+        false_token.balance(&h.contract_id),
+        0,
+        "failed transfer must not grow the contract's pool"
+    );
+    assert!(
+        h.env.events().all().events().is_empty(),
+        "reverted transfer must emit no success event"
+    );
+}
