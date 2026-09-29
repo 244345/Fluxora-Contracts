@@ -86,10 +86,7 @@ extern crate std;
 
 mod accrual;
 #[cfg(test)]
-mod checksum;
-#[cfg(test)]
 mod protocol_limits;
-mod token_check;
 mod error;
 mod events;
 mod storage;

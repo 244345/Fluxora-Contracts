@@ -127,6 +127,8 @@ pub enum ReleaseCurve {
     /// decelerates into maturity, so the recipient is always at or ahead of
     /// the linear schedule and the sender's exposure is front-loaded.
     FrontLoaded = 2,
+}
+
 /// Which clock the cliff gate is measured against.
 ///
 /// The cliff *gates* the payout; it does not delay accrual, and both modes
