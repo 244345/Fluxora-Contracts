@@ -1215,3 +1215,63 @@ fn fewer_token_decimals_do_not_rescale_deposit_or_withdrawal() {
         "sender + recipient + pool must conserve the initial token balance"
     );
 }
+
+#[test]
+fn rebase_style_balance_loss_is_detected_and_does_not_corrupt_other_streams() {
+    let h = Harness::new();
+    let (token, tc, admin) = make_clawback_token(&h);
+    let contract_id = h.contract_id.clone();
+
+    admin.mint(&h.sender, &(2_000 * ONE));
+    let start = h.now();
+    let a = h.client.create_stream(
+        &h.sender,
+        &h.recipient,
+        &token,
+        &(1_000 * ONE),
+        &start,
+        &(start + 100 * DAY),
+        &start,
+        &true,
+        &true,
+        &true,
+    );
+    let b = h.client.create_stream(
+        &h.sender,
+        &h.recipient,
+        &token,
+        &(1_000 * ONE),
+        &start,
+        &(start + 100 * DAY),
+        &start,
+        &true,
+        &true,
+        &true,
+    );
+    h.advance(50 * DAY);
+
+    let before_b = h.client.get_stream(&b);
+
+    // Out-of-band balance loss on the pool — stands in for a negative
+    // rebase. Leaves just enough to cover stream A alone, well short of both
+    // streams' combined outstanding liability.
+    let a_liability = h.client.withdrawable_of(&a);
+    admin.clawback(&contract_id, &(tc.balance(&contract_id) - a_liability));
+
+    // The pool is short, so the next withdrawal on this token is rejected with
+    // the reconciliation error — the pool's real balance no longer backs the
+    // accounting — and the invocation rolls back in full.
+    let err = h.client.try_withdraw(&a, &None).unwrap_err().unwrap();
+    assert_eq!(err, Error::PoolBalanceDrift);
+    let err = h.client.try_withdraw(&b, &None).unwrap_err().unwrap();
+    assert_eq!(err, Error::PoolBalanceDrift);
+
+    // B's own accounting is untouched by A's rejected withdrawal or by the
+    // out-of-band loss: the rebase corrupted the pool's real balance, not
+    // Fluxora's bookkeeping.
+    let after_b = h.client.get_stream(&b);
+    assert_eq!(after_b.withdrawn, before_b.withdrawn);
+    assert_eq!(after_b.deposited, before_b.deposited);
+    assert_eq!(after_b.status, StreamStatus::Active);
+    assert_eq!(tc.balance(&h.recipient), 0, "no payout may move");
+}

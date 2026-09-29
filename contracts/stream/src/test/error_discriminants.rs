@@ -99,6 +99,8 @@ pub(super) const DISCRIMINANT_FIXTURE: &[(&str, u32)] = &[
     ("TokenAmountMismatch", 32),
     // --- Vesting monotonicity ---
     ("VestedDecreased", 33),
+    // --- Rebase detection ---
+    ("PoolBalanceDrift", 34),
     // --- Contract-level emergency halt (#1818) ---
     ("ContractHalted", 34),
     ("HaltOperatorAlreadySet", 35),
@@ -111,6 +113,7 @@ pub(super) const DISCRIMINANT_FIXTURE: &[(&str, u32)] = &[
 ///
 /// New variants must use `LAST_DISCRIMINANT + 1`. This constant is checked
 /// against the fixture length so a gap is caught immediately.
+const LAST_DISCRIMINANT: u32 = 34;
 const LAST_DISCRIMINANT: u32 = 38;
 
 /// Assert that the fixture has no gaps and ends at `LAST_DISCRIMINANT`.
@@ -186,6 +189,7 @@ fn discriminant_fixture_matches_source() {
         ("InvalidTopUp", Error::InvalidTopUp as u32),
         ("TokenAmountMismatch", Error::TokenAmountMismatch as u32),
         ("VestedDecreased", Error::VestedDecreased as u32),
+        ("PoolBalanceDrift", Error::PoolBalanceDrift as u32),
         ("ContractHalted", Error::ContractHalted as u32),
         (
             "HaltOperatorAlreadySet",
@@ -1181,6 +1185,19 @@ fn vested_decreased_discriminant_value() {
     );
 }
 
+// #34 — PoolBalanceDrift ----------------------------------------------------
+//
+// Issue #1805. Driven end-to-end (a rebasing token desynchronising the pool,
+// detected on the next `withdraw`, `top_up` or `cancel`) in `test::rebase_drift`,
+// which also pins this discriminant. It is `Reach`-classified in
+// `test::error_reachability`, whose ABI cross-check lives in this fixture.
+
+#[test]
+fn pool_balance_drift_discriminant_value() {
+    assert_eq!(
+        Error::PoolBalanceDrift as u32,
+        34,
+        "PoolBalanceDrift discriminant must be 34",
 // #34–#38 — contract-level emergency halt (#1818) ---------------------------
 //
 // Driven end-to-end from the public ABI in `test::halt`, which halts a live
